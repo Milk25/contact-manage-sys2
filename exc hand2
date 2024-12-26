@@ -1,0 +1,149 @@
+contacts = {
+    "123-456-7890": {
+        "name": "John Doe",
+        "email": "johndoe@example.com",
+        "phone": "123-456-7890",
+        "address": "123 Main St",
+        "notes": "Friend from work"
+    }
+}
+
+
+
+import re
+
+def display_menu():
+    print("\nWelcome to the Contact Management System!")
+    print("Menu:")
+    print("1. Add a new contact")
+    print("2. Edit an existing contact")
+    print("3. Delete a contact")
+    print("4. Search for a contact")
+    print("5. Display all contacts")
+    print("6. Export contacts to a text file")
+    print("7. Import contacts from a text file (BONUS)")
+    print("8. Quit")
+
+def get_valid_input(prompt, pattern):
+    while True:
+        user_input = input(prompt)
+        if re.match(pattern, user_input):
+            return user_input
+        else:
+            print("Invalid input. Please try again.")
+
+def add_contact():
+    name = input("Enter contact's name: ")
+    phone = get_valid_input("Enter contact's phone number (xxx-xxx-xxxx): ", r"\d{3}-\d{3}-\d{4}")
+    email = get_valid_input("Enter contact's email: ", r"[^@]+@[^@]+\.[^@]+")
+    address = input("Enter contact's address: ")
+    notes = input("Enter any notes about the contact: ")
+    contacts[phone] = {
+        "name": name,
+        "email": email,
+        "phone": phone,
+        "address": address,
+        "notes": notes
+    }
+    print("Contact added successfully!")
+
+def edit_contact():
+    phone = get_valid_input("Enter the phone number of the contact you want to edit: ", r"\d{3}-\d{3}-\d{4}")
+    if phone in contacts:
+        print("Editing contact:", contacts[phone]["name"])
+        name = input(f"Enter new name (current: {contacts[phone]['name']}): ") or contacts[phone]["name"]
+        email = input(f"Enter new email (current: {contacts[phone]['email']}): ") or contacts[phone]["email"]
+        address = input(f"Enter new address (current: {contacts[phone]['address']}): ") or contacts[phone]["address"]
+        notes = input(f"Enter new notes (current: {contacts[phone]['notes']}): ") or contacts[phone]["notes"]
+        contacts[phone] = {
+            "name": name,
+            "email": email,
+            "phone": phone,
+            "address": address,
+            "notes": notes
+        }
+        print("Contact updated successfully!")
+    else:
+        print("Contact not found.")
+
+def delete_contact():
+    phone = get_valid_input("Enter the phone number of the contact you want to delete: ", r"\d{3}-\d{3}-\d{4}")
+    if phone in contacts:
+        del contacts[phone]
+        print("Contact deleted successfully!")
+    else:
+        print("Contact not found.")
+
+def search_contact():
+    phone = get_valid_input("Enter the phone number of the contact to search: ", r"\d{3}-\d{3}-\d{4}")
+    if phone in contacts:
+        contact = contacts[phone]
+        print("Contact found:")
+        for key, value in contact.items():
+            print(f"{key.capitalize()}: {value}")
+    else:
+        print("Contact not found.")
+
+def display_all_contacts():
+    if contacts:
+        print("\nAll Contacts:")
+        for contact in contacts.values():
+            for key, value in contact.items():
+                print(f"{key.capitalize()}: {value}")
+            print("-" * 20)
+    else:
+        print("No contacts found.")
+
+def export_contacts():
+    with open("contacts.txt", "w") as file:
+        for contact in contacts.values():
+            file.write(f"{contact['name']} | {contact['phone']} | {contact['email']} | {contact['address']} | {contact['notes']}\n")
+    print("Contacts exported to contacts.txt")
+
+def import_contacts():
+    try:
+        with open("contacts.txt", "r") as file:
+            for line in file:
+                name, phone, email, address, notes = line.strip().split(" | ")
+                contacts[phone] = {
+                    "name": name,
+                    "phone": phone,
+                    "email": email,
+                    "address": address,
+                    "notes": notes
+                }
+        print("Contacts imported successfully!")
+    except FileNotFoundError:
+        print("No contacts file found.")
+
+def run():
+    while True:
+        display_menu()
+        choice = input("Choose an option (1-8): ")
+        try:
+            if choice == "1":
+                add_contact()
+            elif choice == "2":
+                edit_contact()
+            elif choice == "3":
+                delete_contact()
+            elif choice == "4":
+                search_contact()
+            elif choice == "5":
+                display_all_contacts()
+            elif choice == "6":
+                export_contacts()
+            elif choice == "7":
+                import_contacts()
+            elif choice == "8":
+                print("Exiting the program. Goodbye!")
+                break
+            else:
+                print("Invalid choice. Please try again.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            print("\nReturning to menu...\n")
+
+if __name__ == "__main__":
+    run()
